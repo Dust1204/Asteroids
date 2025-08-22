@@ -8,37 +8,53 @@ from shot import Shot
 
 def main():
     pygame.init()
-    print("Starting Asteroids!")
-    print(f"Screen width: {SCREEN_WIDTH}")
-    print(f"Screen height: {SCREEN_HEIGHT}")
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
+
+    updatable = pygame.sprite.Group()
+    drawable = pygame.sprite.Group()
+    asteroids = pygame.sprite.Group()
+    shots = pygame.sprite.Group()
+    Asteroid.containers = (asteroids, updatable, drawable)    
+    Shot.containers = (shots, updatable, drawable)    
+    AsteroidField.containers = updatable
+    asteroid_field = AsteroidField()
+
+    Player.containers = (updatable, drawable)
+
+    player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+
     dt = 0
-    updatable_group = pygame.sprite.Group()
-    drawable_group = pygame.sprite.Group()
-    asteroid_group = pygame.sprite.Group()
-    shot_group = pygame.sprite.Group()
-    Player.containers = (updatable_group, drawable_group)
-    Asteroid.containers = (asteroid_group, updatable_group, drawable_group)
-    AsteroidField.containers = (updatable_group,)
-    Shot.containers = (shot_group, updatable_group, drawable_group)
-    player = Player((SCREEN_WIDTH / 2), (SCREEN_HEIGHT) / 2)
-    asteroidfield = AsteroidField()
 
     while True: #infinite loop
-        screen.fill("black")
-        for drawable in drawable_group:
-            drawable.draw(screen)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
-        updatable_group.update(dt)
+
+        updatable.update(dt)
+
+        for asteroid in asteroids:
+            if asteroid.collides_with(player):
+                pass
+                #print("Game over!")
+                #sys.exit()
+
+        for shot in shots:
+            if asteroid.collides_with(shot):
+                print(f"Player at {player.position} shot {shot.position} hit asteroid {asteroid.position}!")
+                shot.kill()
+                asteroid.kill()
+
+        screen.fill("black")
+
+        for obj in drawable:
+            obj.draw(screen)
+
         pygame.display.flip()
+
+        # limit the framerate to 60 FPS
         dt = clock.tick(60) / 1000
-        for asteroid in asteroid_group:
-            if asteroid.collision(player):
-                print("Game over!")
-                sys.exit()
+
 
 if __name__ == "__main__":
     main()
