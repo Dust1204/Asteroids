@@ -1,4 +1,5 @@
 import pygame
+import random
 from constants import *
 from circleshape import CircleShape
 from shot import Shot
@@ -23,6 +24,7 @@ class Player(CircleShape):
 
     def update(self, dt):
         self.shoot_timer -= dt
+
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_a]:
@@ -35,17 +37,34 @@ class Player(CircleShape):
             self.move(-dt)
         if keys[pygame.K_SPACE]:
             self.shoot()
+        if keys[pygame.K_LSHIFT]:
+            self.boost()
+        else:
+            self.speed = PLAYER_SPEED
+            self.turn_speed = PLAYER_TURN_SPEED
+        
+        if self.shoot_timer >= random.uniform(0.08, 0.1):
+            shot = Shot(self.position.x, self.position.y)
+            shot.velocity = pygame.Vector2(0, 1).rotate(self.rotation - random.uniform(0, 10)) * PLAYER_SHOOT_SPEED
+        if self.shoot_timer >= random.uniform(0.08, 0.1):
+            shot = Shot(self.position.x, self.position.y)
+            shot.velocity = pygame.Vector2(0, 1).rotate(self.rotation + random.uniform(0, 10)) * PLAYER_SHOOT_SPEED
 
     def shoot(self):
         if self.shoot_timer > 0:
-            return
+            return        
         self.shoot_timer = PLAYER_SHOOT_COOLDOWN
         shot = Shot(self.position.x, self.position.y)
         shot.velocity = pygame.Vector2(0, 1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
 
+
     def rotate(self, dt):
-        self.rotation += PLAYER_TURN_SPEED * dt
+        self.rotation += self.turn_speed * dt
 
     def move(self, dt):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
-        self.position += forward * PLAYER_SPEED * dt
+        self.position += forward * self.speed * dt
+
+    def boost(self):
+        self.speed = PLAYER_SPEED * 2
+        self.turn_speed = PLAYER_TURN_SPEED * .75

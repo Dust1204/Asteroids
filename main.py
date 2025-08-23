@@ -36,15 +36,14 @@ def main():
 
         for asteroid in asteroids:
             if asteroid.collides_with(player):
-                pass
-                #print("Game over!")
+                print("Game over!")
                 #sys.exit()
 
             for shot in shots:
-                if asteroid.collides_with(shot):
-                    print(f"Player at {player.position} shot {shot.position} hit asteroid {asteroid.position}!")
+                if asteroid.collides_with(shot):                    
                     shot.kill()
-                    asteroid.kill()
+                    asteroid.split()
+                    break
 
         screen.fill("black")
 
